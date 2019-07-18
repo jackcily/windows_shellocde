@@ -19,11 +19,11 @@ int main ()
 }
 ```
 
-为了实现函数调用，首先要知道函数在内存中的地址。（由于`ASLR`的原因，函数的内存地址在每台机器上可能会不一样）可以使用动态加载dll的方式获取，[代码在此 sys_inline_shellcode.c]()。
+为了实现函数调用，首先要知道函数在内存中的地址。（由于`ASLR`的原因，函数的内存地址在每台机器上可能会不一样）可以使用动态加载dll的方式获取，[代码在此 sys_inline_shellcode.c](sys_inline_shellcode.c)。
 
 执行结果如下：
 
-![1](D:\Administrator\desktop_bak\Desktop\windows_shellocde_study\file\system.JPG)
+![1](https://github.com/jackcily/windows_shellocde_study/raw/master/file/system.JPG)
 
 
 
@@ -75,9 +75,11 @@ mov  dword ptr[ebp-04h],ebx
 
 ---
 
-为了提取对应shellcode的机器码，在vs2019下进入调试状态，打开反汇编窗口，即可获取反汇编代码，但是采用这种方法获取的shellcode却无法执行成功，<font color = "red">原因暂时还不清</font>。[代码在此 sys_inline_shellcode2.c]()
+为了提取对应shellcode的机器码，在vs2019下进入调试状态，打开反汇编窗口，即可获取反汇编代码，但是采用这种方法获取的shellcode却无法执行成功，<font color = "red">原因暂时还不清</font>。[代码在此 sys_inline_shellcode2.c](https://github.com/jackcily/windows_shellocde_study/raw/master/file/sys_inline_shellcode2.c)
 
-![get_shellcode](D:\Administrator\desktop_bak\Desktop\windows_shellocde_study\file\get_shellcode.JPG)
+
+
+![get_shellcode](https://github.com/jackcily/windows_shellocde_study/raw/master/file/get_shellcode.JPG)
 
 
 
@@ -140,4 +142,3 @@ ubuntu18.04_server / apache2
 #### 问题
 
 - 已经获取了汇编asm，如何转换为可执行的exe文件？（怎么执行shellcode）
-
