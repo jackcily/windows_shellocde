@@ -19,7 +19,7 @@ int main ()
 }
 ```
 
-为了实现函数调用，首先要知道函数在内存中的地址。（由于`ASLR`的原因，函数的内存地址在每台机器上可能会不一样）可以使用动态加载dll的方式获取，[代码在此 sys_inline_shellcode.c](sys_inline_shellcode.c)。
+为了实现函数调用，首先要知道函数在内存中的地址。（由于`ASLR`的原因，函数的内存地址在每台机器上可能会不一样）可以使用动态加载dll的方式获取，[代码在此 sys_inline_shellcode.c](https://github.com/jackcily/windows_shellocde_study/raw/master/file/sys_inline_shellcode.c)。
 
 执行结果如下：
 
@@ -105,9 +105,18 @@ mov  dword ptr[ebp-04h],ebx
 
 
 
+**kenel32的定位方式不止一种，可以使用PEB结构定位kernel的地址。**
 
+这种方式的核心思想是在 PEB映射的模块中，kernel32.dll 通常是在 InInitializationOrderModuleList 中的第二个。
 
+为了获得当前PEB的起始地址，可以通过FS段寄存器。（32位系统，64位中使用GS）
 
+因为OS完成加载后，FS段寄存器指向当前的TEB结构，通过TEB结构的偏移0x30 (ProcessEnvironmentBlock 当前进程的PEB指针) 处获得PEB的起始地址。
+
+```asm
+mov eax,fs:[0x30]
+mov PEB,eax
+```
 
 
 
@@ -116,8 +125,6 @@ mov  dword ptr[ebp-04h],ebx
 ------
 
 拟复现的shellcode链接在此[Windows/x86 - URLDownloadToFileA](https://www.exploit-db.com/shellcodes/40094)
-
-
 
 #####　实验环境
 
@@ -136,6 +143,8 @@ ubuntu18.04_server / apache2
 #### 参考资料
 
 - [Windows x64 Shellcode](http://mcdermottcybersecurity.com/articles/windows-x64-shellcode#the-code)
+- [PEB和TEB](https://www.cnblogs.com/hanfenglun/archive/2009/03/20/1417506.html)
+- [PEB TEB结构体使用](https://blog.csdn.net/chriz_w/article/details/52096552)
 
 
 
