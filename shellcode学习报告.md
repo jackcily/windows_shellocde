@@ -109,6 +109,14 @@ mov  dword ptr[ebp-04h],ebx
 
 这种方式的核心思想是在 PEB映射的模块中，kernel32.dll 通常是在 InInitializationOrderModuleList 中的第二个。
 
+此处实地考证一下，在vs中打印出当前工程所执行进程所加载的所有模块 ,[代码在此 all_module.cpp]()。
+
+发现dll的确是其中链接的第2个模块，打印结果如下：
+
+![show_dll](D:\Administrator\desktop_bak\Desktop\windows_shellocde_study\file\show_dll.JPG)
+
+
+
 为了获得当前PEB的起始地址，可以通过FS段寄存器。（32位系统，64位中使用GS）
 
 因为OS完成加载后，FS段寄存器指向当前的TEB结构，通过TEB结构的偏移0x30 (ProcessEnvironmentBlock 当前进程的PEB指针) 处获得PEB的起始地址。
@@ -117,6 +125,25 @@ mov  dword ptr[ebp-04h],ebx
 mov eax,fs:[0x30]
 mov PEB,eax
 ```
+
+
+
+获取当前线程所在进程的PEB结构体指针以后，可以通过指针指向获取到kernel32.dll的dllbase，具体分析可以参照[Windows平台shellcode开发入门（二）--- 进程环境块（PEB）](https://www.freebuf.com/articles/system/94774.html)
+
+八行汇编就可以搞定这个过程。
+
+```asm
+xor ecx, ecx
+mov eax, fs:[ecx + 0x30]; EAX = PEB
+mov eax, [eax + 0xc]; EAX = PEB->Ldr 指针跳转从InMemoryOrderModuleList->InMemoryOrderLinks1
+mov esi, [eax + 0x14]; ESI = PEB->Ldr.InMemOrder  dll双端链表head 
+lodsd; EAX = Second module  指针跳转从InMemoryOrderLinks1->InMemoryOrderLinks2
+xchg eax, esi; EAX = ESI, ESI = EAX;此时esi中是第一个模块的起点list
+lodsd; EAX = Third(kernel32)  指针跳转从InMemoryOrderLinks2->InMemoryOrderLinks3
+mov ebx, [eax + 0x10]; EBX = Base address kernel32.dll
+```
+
+
 
 
 
@@ -149,9 +176,41 @@ ubuntu18.04_server / apache2
 - [Windows x64 Shellcode](http://mcdermottcybersecurity.com/articles/windows-x64-shellcode#the-code)
 - [PEB和TEB](https://www.cnblogs.com/hanfenglun/archive/2009/03/20/1417506.html)
 - [PEB TEB结构体使用](https://blog.csdn.net/chriz_w/article/details/52096552)
+- [段寄存器和8种地址寻址方式](https://blog.csdn.net/judyge/article/details/52337096)
+- [枚举进程中的模块](https://blog.csdn.net/lanuage/article/details/72331277)
 
 
 
 #### 问题
 
 - 已经获取了汇编asm，如何转换为可执行的exe文件？（怎么执行shellcode）
+
+- 32位寄存器的寻址方式怎么计算？
+
+  首先需要区分基址寄存器、变址寄存器、段寄存器
+
+- 
+
+
+
+#### 背景知识
+
+- 一些汇编指令的解释
+
+  ```asm
+  lodsw 等价于 mov eax,[esi] , add esi 4h
+  ```
+
+  
+
+
+
+
+
+
+
+virtualprotect
+
+增加一个编译选项  function order
+
+vs可以直接编译asm/masm也可
