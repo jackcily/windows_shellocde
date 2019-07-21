@@ -117,7 +117,7 @@ mov  dword ptr[ebp-04h],ebx
 
 
 
-为了获得当前PEB的起始地址，可以通过FS段寄存器。（32位系统，64位中使用GS）
+**为了获得当前PEB的起始地址，可以通过FS段寄存器。**（32位系统，64位中使用GS）
 
 因为OS完成加载后，FS段寄存器指向当前的TEB结构，通过TEB结构的偏移0x30 (ProcessEnvironmentBlock 当前进程的PEB指针) 处获得PEB的起始地址。
 
@@ -125,8 +125,6 @@ mov  dword ptr[ebp-04h],ebx
 mov eax,fs:[0x30]
 mov PEB,eax
 ```
-
-
 
 获取当前线程所在进程的PEB结构体指针以后，可以通过指针指向获取到kernel32.dll的dllbase，具体分析可以参照[Windows平台shellcode开发入门（二）--- 进程环境块（PEB）](https://www.freebuf.com/articles/system/94774.html)
 
@@ -143,11 +141,9 @@ lodsd; EAX = Third(kernel32)  指针跳转从InMemoryOrderLinks2->InMemoryOrderL
 mov ebx, [eax + 0x10]; EBX = Base address kernel32.dll
 ```
 
+**获取PEB起始地址以后，通过解析PE文件结构定位函数入口地址**。详细分析见[Windows平台shellcode开发入门（二）---PE文件格式](https://www.freebuf.com/articles/system/94774.html)
 
-
-
-
-
+综上可以写出一个自定位函数地址的shellcode，此处是[system函数自定位示例代码 funcAddr.cpp]()。
 
 
 
@@ -199,6 +195,7 @@ ubuntu18.04_server / apache2
 
   ```asm
   lodsw 等价于 mov eax,[esi] , add esi 4h
+  lea  esi, [ebp - 04h] 等价于 mov esi,ebp - 04h
   ```
 
   
