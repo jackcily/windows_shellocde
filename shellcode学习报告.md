@@ -161,31 +161,59 @@ ubuntu18.04_server / apache2
 
 拟在windws7中下载ubuntu18.04中的软件，但是shellcode执行失败，程序暂时还未调通。
 
+于是决定自己实现一下下载执行器的功能。
 
+首先假设已经获取URLDownloadToFileA函数地址，使用C语言内联函数[调用代码在此urldownload_inline.cpp]()
 
+结合shellcode函数自定位实现下载功能[downloader_inline.cpp]()
 
+再次修改实现下载执行功能[downloader_and_exec_inline.cpp]()
 
 
 
 #### 参考资料
 
 - [Windows x64 Shellcode](http://mcdermottcybersecurity.com/articles/windows-x64-shellcode#the-code)
+
 - [PEB和TEB](https://www.cnblogs.com/hanfenglun/archive/2009/03/20/1417506.html)
+
 - [PEB TEB结构体使用](https://blog.csdn.net/chriz_w/article/details/52096552)
+
 - [段寄存器和8种地址寻址方式](https://blog.csdn.net/judyge/article/details/52337096)
+
 - [枚举进程中的模块](https://blog.csdn.net/lanuage/article/details/72331277)
 
+- [Windows下Shellcode编写详解](https://xz.aliyun.com/t/2108)
 
+- [Windows平台shellcode开发入门](https://www.freebuf.com/articles/system/94774.html)
+
+- [C++下载指定Url网络地址上的文件-Windows Api](https://blog.csdn.net/HW140701/article/details/78207490)
+
+  
 
 #### 问题
 
 - 已经获取了汇编asm，如何转换为可执行的exe文件？（怎么执行shellcode）
 
+  可以使用vs中的功能直接将整段函数代码直接写到文件中。
+
+  具体步骤为首先规定函数编译顺序，然后将指定位置中的函数写入字符串中。
+
+- vs2019中直接将shellcode存储成字符串无法执行？
+
+  因为字符串默认只有可读权限，需要修改字符串对应地址为可读可执行权限。具体示例如下：
+
+  ```c++
+  unsigned char shellcode[] = "\x55\x8B\xEC\x81\xEC\xC0\x00\x00\x00\x53\x56\x57\x8D\xBD\x40\xFF\xFF\xFF\xB9\x30\x00\x00\x00\xB8\xCC\xCC\xCC\xCC\xF3\xAB\x55\x8B\xEC\x81\xEC\xC0\x00\x00\x00\x55\x8B\xEC\x83\xEC\x04\x33\xDB\xBB\x64\x69\x72\x00\x89\x5D\xFC\x8D\x5D\xFC\x53\xBB\x10\x3B\x32\x74\xFF\xD3\x83\xC4\x04\x5B\x5D\x5F\x5E\x5B\x81\xC4\xC0\x00\x00\x00\x3B\xEC\xE8\xB3\xFA\xFF\xFF\x8B\xE5\x5D\xC3";
+     
+  DWORD lp;
+  VirtualProtect(shellcode, sizeof(shellcode), PAGE_EXECUTE_READWRITE, &lp);
+  ```
+
 - 32位寄存器的寻址方式怎么计算？
 
   首先需要区分基址寄存器、变址寄存器、段寄存器
 
-- 
 
 
 
@@ -199,10 +227,6 @@ ubuntu18.04_server / apache2
   ```
 
   
-
-
-
-
 
 
 
