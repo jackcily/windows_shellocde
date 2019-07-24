@@ -169,6 +169,14 @@ ubuntu18.04_server / apache2
 
 再次修改实现下载执行功能[downloader_and_exec_inline.cpp]()
 
+接下来需要将内联汇编代码转换为二进制代码,代码编写参考此处[从汇编代码提取Shellcode的简单实现](http://www.myhack58.com/Article/html/3/68/2011/29739.htm)
+
+[具体代码在此 asm_2_hex.cpp]()
+
+生成完成后在vs2019 x86下执行代码[在此exec_hex.cpp]()。
+
+
+
 
 
 #### 参考资料
@@ -188,6 +196,8 @@ ubuntu18.04_server / apache2
 - [Windows平台shellcode开发入门](https://www.freebuf.com/articles/system/94774.html)
 
 - [C++下载指定Url网络地址上的文件-Windows Api](https://blog.csdn.net/HW140701/article/details/78207490)
+
+- [从汇编代码提取Shellcode的简单实现](http://www.myhack58.com/Article/html/3/68/2011/29739.htm)
 
   
 
@@ -210,9 +220,17 @@ ubuntu18.04_server / apache2
   VirtualProtect(shellcode, sizeof(shellcode), PAGE_EXECUTE_READWRITE, &lp);
   ```
 
+  也可以参考[C语言执行shellcode的五种方法](https://blog.csdn.net/liujiayu2/article/details/78294752)
+
 - 32位寄存器的寻址方式怎么计算？
 
   首先需要区分基址寄存器、变址寄存器、段寄存器
+  
+- 内联汇编代码如何转换为真正的十六进制编码shellcode？
+
+  可以直接从内存中读取
+
+  
 
 
 
@@ -230,8 +248,6 @@ ubuntu18.04_server / apache2
 
 
 
-virtualprotect
+#TODO
 
-增加一个编译选项  function order
-
-vs可以直接编译asm/masm也可
+探索shellcode检测原理，https://github.com/PyAna/PyAna
